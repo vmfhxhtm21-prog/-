@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f7f7f3">
+<meta name="description" content="네물내산 — 취향을 담은 일상의 발견">
+<title>네물내산 | 취향을 담은 일상의 발견</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="home-page">
+<div class="topline"><span>NE MUL NAE SAN</span><span>취향을 담은 오늘의 발견</span><span>GOOD THINGS, GOOD DAYS.</span></div>
+<header class="hdr">
+  <a class="logo" href="index.html" aria-label="네물내산 홈">네물내산<span class="logo-dot">.</span></a>
+  <form class="search" id="searchForm" role="search">
+    <input id="q" type="search" placeholder="어떤 물건을 찾고 있나요?" aria-label="상품명 또는 태그 검색">
+    <button type="submit" aria-label="검색">검색</button>
+  </form>
+  <nav class="icons" aria-label="빠른 메뉴">
+    <a href="wishlist.html"><span class="home-icon">♡</span><small>위시리스트</small><b id="wishCount" hidden>0</b></a>
+    <a href="cart.html"><span class="home-icon">▢</span><small>장바구니</small><b id="cartCount" hidden>0</b></a>
+    <a href="admin.html"><span class="home-icon">↗</span><small>관리자</small></a>
+  </nav>
+</header>
+<nav class="cats home-cats" id="cats" aria-label="상품 카테고리"></nav>
+<div class="subcats home-subcats" id="subcats" aria-label="하위 카테고리"></div>
+<main class="home-main">
+  <section class="home-intro">
+    <div><span class="eyebrow">A LITTLE SOMETHING FOR YOU</span><h1>좋아하는 것을<br><em>발견하는 즐거움.</em></h1><p>일상에 오래 머물 취향 있는 물건을 만나보세요.</p></div>
+    <a href="#all-products" class="intro-link">상품 둘러보기 <span>↓</span></a>
+    <div class="intro-stamp">NMS<br><small>CURATED<br>GOODS</small></div>
+  </section>
+
+  <section class="sec home-section mine-section" id="my-products">
+    <div class="sec-h home-sec-h"><div><span class="eyebrow">MY LISTINGS</span><h2>내가 올린 상품</h2><p>직접 등록한 상품을 확인할 수 있어요.</p></div><a class="intro-link" href="admin.html">상품 등록하기 ↗</a></div>
+    <div class="grid home-grid" id="myProducts"></div>
+  </section>
+
+  <section class="sec home-section all-section" id="all-products">
+    <div class="sec-h home-sec-h"><div><span class="eyebrow">FIND YOUR FAVORITE</span><h2 id="listTitle">전체 상품</h2><p>마음에 드는 상품을 천천히 둘러보세요.</p></div>
+      <label class="sort-control">정렬 <select id="sort"><option value="latest">최신순</option><option value="likes">좋아요순</option><option value="views">조회수순</option><option value="price_asc">낮은 가격</option><option value="price_desc">높은 가격</option></select></label>
+    </div>
+    <div class="tags home-tags" id="tags"></div>
+    <div class="layout home-layout">
+      <aside class="filter home-filter"><div class="filter-head"><span class="eyebrow">FILTER</span><h3>상품 찾기</h3></div><h4>가격대</h4>
+        <label><input type="number" id="minP" placeholder="최소 금액"></label><label><input type="number" id="maxP" placeholder="최대 금액"></label>
+        <label class="chk"><input type="checkbox" id="inStock"> 품절 상품 제외</label>
+        <div class="filter-note">원하는 조건으로<br>상품을 찾아보세요.</div>
+      </aside>
+      <div class="home-results"><div class="result-meta"><span>ALL ITEMS</span><span>마음에 드는 상품을 골라보세요</span></div><div class="grid home-grid" id="list"></div><div class="pager" id="pager"></div></div>
+    </div>
+  </section>
+</main>
+<footer class="ftr home-footer"><div class="footer-top"><a class="logo" href="index.html">네물내산<span class="logo-dot">.</span></a><span>GOOD THINGS, GOOD DAYS.</span></div><div class="footer-links"><a href="index.html">홈</a><a href="wishlist.html">위시리스트</a><a href="cart.html">장바구니</a><a href="admin.html">상품 관리</a></div><p>네물내산 · 취향을 담은 일상의 발견</p></footer>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

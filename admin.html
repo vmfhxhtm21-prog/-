@@ -1,0 +1,38 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"><link rel="stylesheet" href="css/style.css"><title>네물내산 | 관리자</title></head><body><div id="hdr"></div>
+<main class="wrap"><h1>상품 등록</h1><form class="f" id="f">
+<label>상품명<input name="name" required></label>
+<label>설명<textarea name="description" rows="3"></textarea></label>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"><label>가격(원)<input name="price" type="number" min="0" required></label><label>할인율(%)<input name="discount_rate" type="number" min="0" max="90" value="0"></label><label>재고<input name="stock" type="number" min="0" value="10"></label></div>
+<label>카테고리<select name="category_id" id="cat"></select></label>
+<label>태그 (Enter로 추가, 최대 5개)<input id="tagIn" placeholder="예: 신상"></label><div id="chips"></div>
+<label>이미지 (여러 장 선택 가능, 첫 번째가 대표)<input type="file" id="files" accept="image/*" multiple></label><div class="prev-imgs" id="imgs"></div>
+<label class="chk"><input type="checkbox" id="feat"> 메인 슬라이더에 노출</label>
+<button class="btn pri big">등록하기</button></form>
+<h2 style="margin-top:40px">내가 등록한 상품</h2><div id="mine"></div>
+<p class="muted">※ 연습용: 로그인 없이 접근돼요. 이미지는 브라우저(localStorage)에 저장돼서 용량 한도가 있어요. DB 연결 후엔 파일 업로드로 바뀌어요.</p></main><script src="js/api.js"></script><script src="js/common.js"></script>
+<script>
+header();
+let tags = [], imgs = [];
+const chips = () => document.querySelector('#chips').innerHTML = tags.map((t, i) => `<span class="chip">#${t}<b data-t="${i}">×</b></span>`).join('');
+const gallery = () => document.querySelector('#imgs').innerHTML = imgs.map((s, i) => `<div><img src="${s}" alt=""><span>${i ? i + 1 : '대표'}</span><button type="button" class="btn" data-up="${i}">${i ? '대표로' : '삭제'}</button></div>`).join('');
+document.querySelector('#chips').onclick = e => { if (e.target.dataset.t) { tags.splice(+e.target.dataset.t, 1); chips(); } };
+document.querySelector('#tagIn').onkeydown = e => { if (e.key !== 'Enter') return; e.preventDefault();
+  const t = e.target.value.trim().replace(/^#/, '').toLowerCase(); e.target.value = '';
+  if (t && !tags.includes(t) && tags.length < 5) { tags.push(t); chips(); } };
+document.querySelector('#imgs').onclick = e => { const i = e.target.dataset.up; if (i === undefined) return; imgs = +i ? [imgs[+i], ...imgs.filter((_, k) => k !== +i)] : imgs.slice(1); gallery(); };
+const shrink = f => new Promise(res => { const r = new FileReader(); r.onload = () => { const im = new Image(); im.onload = () => { const s = Math.min(1, 800 / Math.max(im.width, im.height)), c = document.createElement('canvas');
+  c.width = im.width * s; c.height = im.height * s; c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); res(c.toDataURL('image/jpeg', .7)); }; im.src = r.result; }; r.readAsDataURL(f); });
+document.querySelector('#files').onchange = async e => { imgs.push(...await Promise.all([...e.target.files].map(shrink))); e.target.value = ''; gallery(); };
+api.getCategories().then(cs => document.querySelector('#cat').innerHTML = cs.filter(c => c.parent_id).map(c => `<option value="${c.id}">${cs.find(p => p.id === c.parent_id).name} › ${c.name}</option>`).join(''));
+document.querySelector('#f').onsubmit = async e => {
+  e.preventDefault(); if (!imgs.length) return toast('이미지를 1장 이상 올려주세요');
+  const d = Object.fromEntries(new FormData(e.target));
+  try { await api.addProduct({ name: d.name, description: d.description, price: +d.price, discount_rate: +d.discount_rate, stock: +d.stock, category_id: +d.category_id, tags, images: imgs, is_featured: document.querySelector('#feat').checked }); }
+  catch (err) { return toast('저장 공간이 부족해요. 이미지 수를 줄여보세요'); }
+  toast('등록했어요'); e.target.reset(); tags = []; imgs = []; chips(); gallery(); mine();
+};
+async function mine() { const ps = (await api.getProducts({ sort: 'latest' })).items.filter(p => p.id > 16);
+  document.querySelector('#mine').innerHTML = ps.map(p => `<div class="row"><img src="${p.thumbnail}" alt=""><div class="g"><a href="product.html?id=${p.id}"><b>${p.name}</b></a><div>${won(p.price)}</div></div><button class="btn" data-del="${p.id}">삭제</button></div>`).join('') || '<p class="muted">아직 등록한 상품이 없어요.</p>'; }
+document.querySelector('#mine').onclick = async e => { if (e.target.dataset.del && confirm('삭제할까요?')) { await api.deleteProduct(+e.target.dataset.del); mine(); } };
+mine();
+</script></body></html>

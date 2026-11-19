@@ -1,0 +1,11 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"><link rel="stylesheet" href="css/style.css"><title>네물내산 | 위시리스트</title></head><body><div id="hdr"></div>
+<main class="wrap"><h1>위시리스트</h1><div class="grid" id="list"></div></main><script src="js/api.js"></script><script src="js/common.js"></script>
+<script>
+header();
+window.onChange = render;
+async function render() {
+  const ids = await api.getWishlist(), ps = (await Promise.all(ids.map(i => api.getProduct(i)))).filter(Boolean);
+  document.querySelector('#list').innerHTML = ps.length ? ps.map(card).join('') : '<p class="empty">담아둔 상품이 없어요. 마음에 드는 상품의 ♡를 눌러보세요.</p>';
+}
+render();
+</script></body></html>

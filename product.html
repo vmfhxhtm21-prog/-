@@ -1,0 +1,32 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"><link rel="stylesheet" href="css/style.css"><title>네물내산 | 상품 상세</title></head><body><div id="hdr"></div>
+<main class="wrap"><div id="box"></div><h2 style="margin-top:40px">같은 카테고리 상품</h2><div class="grid" id="rel"></div></main><script src="js/api.js"></script><script src="js/common.js"></script>
+<script>
+header();
+const id = +new URLSearchParams(location.search).get('id'); let qty = 1;
+async function load(view) {
+  const p = await api.getProduct(id);
+  if (!p) return $('#box').innerHTML = '<p class="empty">없는 상품이에요. <a href="index.html" style="color:var(--ac)">홈으로</a></p>';
+  document.title = p.name; if (view) await api.increaseView(id);
+  const q = await api.getProduct(id);
+  $('#box').innerHTML = `<div class="pd"><div class="gal"><div class="main"><img id="big" src="${q.images[0]}" alt="${q.name}"></div>
+  <div class="thumbs">${q.images.map((s, i) => `<img src="${s}" class="${i ? '' : 'on'}" alt="사진 ${i + 1}">`).join('')}</div></div>
+  <div><span class="muted">${q.category}</span><h1>${q.name}</h1>
+  ${q.discount_rate ? `<span class="old">${won(q.price)}</span>` : ''}<div class="price">${q.discount_rate ? `<em>${q.discount_rate}%</em>` : ''}${won(salePrice(q))}</div>
+  <p class="tg">${q.tags.map(t => `<a href="index.html?tag=${encodeURIComponent(t)}">#${t}</a>`).join('')}</p>
+  <p class="muted">♥ ${q.like_count} · 조회 ${q.view_count.toLocaleString()}</p>
+  <p>${q.stock === 0 ? '<span class="low">품절</span>' : q.stock <= 5 ? `<span class="low">${q.stock}개 남음</span>` : '재고 있음'}</p>
+  ${q.description ? `<p>${q.description}</p>` : ''}
+  <div class="qty"><button id="m" aria-label="감소">−</button><span id="n">${qty}</span><button id="pl" aria-label="증가">+</button></div>
+  <div class="acts"><button class="btn" id="like">${q.liked ? '♥' : '♡'} 좋아요</button><button class="btn" id="wish">${q.wished ? '♥ 위시 해제' : '♡ 위시'}</button>
+  <button class="btn" id="cart" ${q.stock ? '' : 'disabled'}>장바구니</button><button class="btn pri" id="buy" ${q.stock ? '' : 'disabled'}>바로 구매</button></div></div></div>`;
+  document.querySelectorAll('.thumbs img').forEach(t => t.onclick = () => { $('#big').src = t.src; document.querySelectorAll('.thumbs img').forEach(x => x.classList.toggle('on', x === t)); });
+  $('#m').onclick = () => { qty = Math.max(1, qty - 1); $('#n').textContent = qty; };
+  $('#pl').onclick = () => { qty = Math.min(q.stock, qty + 1); $('#n').textContent = qty; };
+  $('#like').onclick = async () => { await api.toggleLike(id); load(); };
+  $('#wish').onclick = async () => { await api.toggleWishlist(id); updateBadges(); load(); };
+  $('#cart').onclick = async () => { await api.addToCart(id, qty); updateBadges(); toast('장바구니에 담았어요'); };
+  $('#buy').onclick = async () => { await api.addToCart(id, qty); location.href = 'checkout.html'; };
+  $('#rel').innerHTML = (await api.getRelated(id)).map(card).join('') || '<p class="empty">관련 상품이 없어요.</p>';
+}
+window.onChange = () => load(); load(true);
+</script></body></html>

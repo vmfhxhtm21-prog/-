@@ -1,0 +1,26 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"><link rel="stylesheet" href="css/style.css"><title>네물내산 | 장바구니</title></head><body><div id="hdr"></div>
+<main class="wrap"><h1>장바구니</h1><div class="two"><div id="items"></div><aside class="sum" id="sum"></aside></div></main><script src="js/api.js"></script><script src="js/common.js"></script>
+<script>
+header();
+async function render() {
+  const items = await cartItems(), c = calc(items);
+  $('#items').innerHTML = items.length ? items.map(({p, qty}) => `<div class="row" data-id="${p.id}"><a href="product.html?id=${p.id}"><img src="${p.thumbnail}" alt=""></a>
+  <div class="g"><a href="product.html?id=${p.id}"><b>${p.name}</b></a><div>${won(salePrice(p))}</div></div>
+  <div class="qty"><button data-d="-1" aria-label="감소">−</button><span>${qty}</span><button data-d="1" aria-label="증가">+</button></div>
+  <b>${won(salePrice(p) * qty)}</b><button class="btn" data-rm="1">삭제</button></div>`).join('') : '<p class="empty">장바구니가 비었어요. <a href="index.html" style="color:var(--ac)">상품 보러 가기</a></p>';
+  $('#sum').innerHTML = `<div><span>상품 금액</span><span>${won(c.sub)}</span></div><div><span>배송비</span><span>${c.ship ? won(c.ship) : '무료'}</span></div>
+  <small class="muted">5만 원 이상 무료배송</small>${c.disc ? `<div><span>쿠폰 할인</span><span>-${won(c.disc)}</span></div>` : ''}
+  <form id="cf" style="display:flex;gap:6px"><input id="cp" placeholder="쿠폰 코드 (WELCOME10)" style="flex:1;padding:8px;border:1px solid var(--line);border-radius:8px"><button class="btn">적용</button></form>
+  <div class="tot"><span>결제 금액</span><span>${won(c.total)}</span></div>
+  <a class="btn pri big" href="checkout.html" style="text-align:center;${items.length ? '' : 'pointer-events:none;opacity:.4'}">결제하기</a>`;
+  $('#cf').onsubmit = e => { e.preventDefault(); const v = $('#cp').value.trim().toUpperCase();
+    if (v === 'WELCOME10') { localStorage.setItem('shop_coupon', v); toast('쿠폰을 적용했어요'); render(); } else toast('사용할 수 없는 쿠폰이에요'); };
+}
+document.addEventListener('click', async e => {
+  const row = e.target.closest('.row'); if (!row) return; const id = +row.dataset.id;
+  if (e.target.dataset.d) { const cur = (await api.getCart()).find(i => i.product_id === id).qty; await api.updateCartQty(id, cur + +e.target.dataset.d); }
+  else if (e.target.dataset.rm) await api.removeFromCart(id); else return;
+  updateBadges(); render();
+});
+render();
+</script></body></html>
