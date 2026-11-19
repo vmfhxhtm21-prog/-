@@ -353,3 +353,19 @@ form.f{display:flex;flex-direction:column;gap:17px;background:white;border:1px s
 @media(max-width:600px){
  .home-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 12px}
 }
+
+
+/* Keep the original medium product size; move only the wishlist control with the zoom */
+.home-grid .thumb{position:relative;overflow:hidden}
+.home-grid .heart{
+  position:absolute;
+  z-index:2;
+  width:34px;
+  height:34px;
+  font-size:17px;
+  transition:top .55s cubic-bezier(.2,.65,.25,1),right .55s cubic-bezier(.2,.65,.25,1);
+}
+.home-grid .card:hover .heart{
+  top:calc(12px - 2.25%);
+  right:calc(12px - 2.25%);
+}
